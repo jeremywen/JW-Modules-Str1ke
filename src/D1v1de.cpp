@@ -86,22 +86,23 @@ struct D1v1de : Module {
 			int divInt = getDivInt();
 			int offsetInt = getOffsetInt();
 			ticks++;
-			if(offsetInt > 0 && ticks % offsetInt == 0){
+			if(ticks == offsetInt){
 				pulseOut = true;
-				gatePulse.trigger(1e-3);
+				gatePulse.trigger(1e-1);
 			}
-			if(ticks % divInt == 0){
+			if(ticks == divInt){
 				if(!pulseOut){
 					pulseOut = true;
-					gatePulse.trigger(1e-3);
+					gatePulse.trigger(1e-1);
 				}
-				outputs[POS_OUTPUT].setVoltage(rescalefjw(ticks, 0.0, divInt, 0.0, 10.0));
 			}
+			outputs[POS_OUTPUT].setVoltage(rescalefjw(ticks, 0.0, divInt, 0.0, 10.0));
 			if(ticks >= divInt){
 				resetSeq();
 			}
 		}
-		outputs[CLOCK_OUTPUT].setVoltage(pulseOut && gatePulse.process(oneOverRate) ? 10.0 : 0.0);
+		bool pulse = gatePulse.process(oneOverRate);
+		outputs[CLOCK_OUTPUT].setVoltage(pulse ? 10.0 : 0.0);
 	}
 
 };

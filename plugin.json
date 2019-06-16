@@ -1,0 +1,33 @@
+{
+  "slug": "Str1ke-JW-Modules",
+  "name": "Str1ke x JW",
+  "version": "1.0.0",
+  "license": "proprietary",
+  "author": "",
+  "authorEmail": "",
+  "authorUrl": "",
+  "pluginUrl": "",
+  "manualUrl": "",
+  "sourceUrl": "",
+  "donateUrl": "",
+  "modules": [
+    {
+      "slug": "Str1ker",
+      "name": "Str1ker",
+      "description": "Clock",
+      "tags": ["Clock"]
+    },
+    {
+      "slug": "D1v1de",
+      "name": "D1v1de",
+      "description": "Clock Divider",
+      "tags": ["Clock Divider", "Visual"]
+    },
+    {
+      "slug": "Pres1t",
+      "name": "Pres1t",
+      "description": "Voltage Storage",
+      "tags": ["Utility"]
+    }
+  ]
+}

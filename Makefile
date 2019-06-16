@@ -5,7 +5,7 @@ SHELL:=/bin/bash -O extglob
 
 FLAGS = \
     -Wno-deprecated-declarations \
-	-o0 \
+	-O0 \
 	-Werror=implicit-function-declaration \
 	-Isrc \
 	-Ilib/oscpack \

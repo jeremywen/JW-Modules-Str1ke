@@ -1,14 +1,14 @@
 {
-  "slug": "Str1ke-JW-Modules",
-  "name": "Str1ke x JW",
+  "slug": "JW-Modules-Savages",
+  "name": "JW-Modules x Savages",
   "version": "1.0.0",
   "license": "proprietary",
-  "author": "",
-  "authorEmail": "",
+  "author": "Jeremy Wentworth & Ted Pallas",
+  "authorEmail": "jeremy@jeremywentworth.com",
   "authorUrl": "",
   "pluginUrl": "",
   "manualUrl": "",
-  "sourceUrl": "",
+  "sourceUrl": "https://github.com/jeremywen/JW-Modules-Str1ke",
   "donateUrl": "",
   "modules": [
     {

@@ -23,7 +23,6 @@ struct D1v1de : Module {
 	};
 
 	int ticks = 0;
-	int seqPos = 0;
 	float smpRate = APP->engine->getSampleRate();	
 	float oneOverRate = 1.0 / smpRate;	
 	dsp::SchmittTrigger resetTrig;
@@ -33,7 +32,7 @@ struct D1v1de : Module {
 	D1v1de() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		configParam(DIV_PARAM, 1, 64, 4, "");
-		configParam(OFFSET_PARAM, 0.0, 1.0, 0, "");
+		configParam(OFFSET_PARAM, 0, 63, 0, "");
 	}
 
 	void onSampleRateChange() override {
@@ -57,7 +56,6 @@ struct D1v1de : Module {
 	}
 
 	void resetSeq() {
-		seqPos = 0;
 		ticks = 0;
 	}
 
@@ -71,8 +69,8 @@ struct D1v1de : Module {
 		return clampijw(divInt, 1, 64);
 	}
 
-	int getOffsetInt(int divInt){
-		return int(round(rescalefjw(params[OFFSET_PARAM].getValue(), 0.0, 1.0, 0.0, divInt)));
+	int getOffsetInt(){
+		return int(params[OFFSET_PARAM].getValue());
 	}
 
 	void onRandomize() override {
@@ -80,26 +78,30 @@ struct D1v1de : Module {
 	}
 
 	void process(const ProcessArgs &args) override {
-		bool nextStep = false;
+		bool pulseOut = false;
 		if (resetTrig.process(inputs[RESET_INPUT].getVoltage())) {
 			resetSeq();
 		}
 		if (clockTrig.process(inputs[CLOCK_INPUT].getVoltage())) {
 			int divInt = getDivInt();
+			int offsetInt = getOffsetInt();
 			ticks++;
-			if(ticks % divInt == 0){
-				if(seqPos >= getOffsetInt(divInt)){
-					nextStep = true;
-					gatePulse.trigger(1e-3);
-					outputs[POS_OUTPUT].setVoltage(rescalefjw(seqPos, 0.0, divInt, 0.0, 10.0));
-				}
-				seqPos++;
+			if(ticks % offsetInt == 0){
+				pulseOut = true;
+				gatePulse.trigger(1e-3);
 			}
-			if(seqPos >= divInt){
+			if(ticks % divInt == 0){
+				if(!pulseOut){
+					pulseOut = true;
+					gatePulse.trigger(1e-3);
+				}
+				outputs[POS_OUTPUT].setVoltage(rescalefjw(ticks, 0.0, divInt, 0.0, 10.0));
+			}
+			if(ticks >= divInt){
 				resetSeq();
 			}
 		}
-		outputs[CLOCK_OUTPUT].setVoltage(nextStep && gatePulse.process(oneOverRate) ? 10.0 : 0.0);
+		outputs[CLOCK_OUTPUT].setVoltage(pulseOut && gatePulse.process(oneOverRate) ? 10.0 : 0.0);
 	}
 
 };
@@ -132,7 +134,7 @@ struct D1v1deDisplay : Widget {
 
 		//offset
 		if(module->params[D1v1de::OFFSET_PARAM].getValue() > 0){
-			float offsetTopY = module->getOffsetInt(divInt) * rowHeight;
+			float offsetTopY = module->getOffsetInt() * rowHeight;
 			nvgFillColor(args.vg, nvgRGB(60, 70, 73));//line color
 			if(offsetTopY+rowHeight < box.size.y+2){
 				nvgBeginPath(args.vg);
@@ -149,7 +151,7 @@ struct D1v1deDisplay : Widget {
 			case 3: nvgFillColor(args.vg, nvgRGB(144, 26, 252)); break;//purple
 		}
 
-		float topY = module->seqPos * rowHeight;
+		float topY = module->ticks * rowHeight;
 		if(topY+rowHeight < box.size.y+2){
 			nvgBeginPath(args.vg);
 			nvgRect(args.vg, 0, topY, box.size.x, rowHeight);
@@ -170,7 +172,6 @@ void D1v1deWidget::step() {
 	D1v1de *d1v = dynamic_cast<D1v1de*>(module);
 	if(d1v && d1v->inputs[D1v1de::DIV_INPUT].isConnected()){
 		divKnob->paramQuantity->setValue(d1v->getDivInt());
-		// divKnob->dirty = true;//TODO FIX?
 		divKnob->step();
 	}
 }

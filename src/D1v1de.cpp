@@ -86,7 +86,7 @@ struct D1v1de : Module {
 			int divInt = getDivInt();
 			int offsetInt = getOffsetInt();
 			ticks++;
-			if(ticks % offsetInt == 0){
+			if(offsetInt > 0 && ticks % offsetInt == 0){
 				pulseOut = true;
 				gatePulse.trigger(1e-3);
 			}

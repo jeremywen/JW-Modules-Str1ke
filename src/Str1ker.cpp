@@ -287,6 +287,11 @@ struct FaderDisplay : Widget {
 			module->resetFader();
 		}
 	}
+
+	// void onDoubleClick(const event::DoubleClick &e) override {
+	// 	e.consume(this);
+	// 	module->resetFader();
+	// }
 	
 	void onDragStart(const event::DragStart &e) override {
 		if (e.button == GLFW_MOUSE_BUTTON_LEFT) {

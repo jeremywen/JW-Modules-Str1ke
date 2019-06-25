@@ -93,10 +93,10 @@ struct Pres1t : Module {
 			cells[selectedCellIdx] = inputs[BPM_INPUT].getVoltage();
 		}
 
-		if(outputs[BPM_OUTPUT].isConnected() && loadTrigger.process(params[LOAD_PARAM].getValue() + inputs[LOAD_INPUT].getVoltage()) && cells[selectedCellIdx] > 0){
+		// This loadTrigger won't work for some reason
+		// if(outputs[BPM_OUTPUT].isConnected() && loadTrigger.process(params[LOAD_PARAM].getValue() + inputs[LOAD_INPUT].getVoltage()) && cells[selectedCellIdx] != 0){
+		if(outputs[BPM_OUTPUT].isConnected() && (params[LOAD_PARAM].getValue() + inputs[LOAD_INPUT].getVoltage() >= 1) && cells[selectedCellIdx] != 0){
 			outputs[BPM_OUTPUT].setVoltage(cells[selectedCellIdx]);
-		} else {
-			outputs[BPM_OUTPUT].setVoltage(0);
 		}
 	}
 
@@ -181,7 +181,7 @@ struct Pres1tDisplay : Widget {
 				nvgStroke(args.vg);
 			}
 			
-			if(module->cells[i] > 0){
+			if(module->cells[i] != 0){
 				nvgFillColor(args.vg, nvgRGB(255, 243, 9)); //yellow
 				nvgBeginPath(args.vg);
 				nvgRect(args.vg, x * HW+2, y * HW+2, HW-4, HW-4);
